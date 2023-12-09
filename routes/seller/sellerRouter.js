@@ -1,0 +1,12 @@
+  const express = require('express')
+const router = express.Router()
+const { login, protect } = require("../../controllers/seller/sellersControllers")
+const { getStats } = require('../../controllers/seller/ordersControllers')
+router.post("/login", login)
+router.get("/stats",protect,getStats)
+router.use("/account",  require("./routes/sellerRouter"))
+router.use("/products", protect, require("./routes/productsRouter"))
+router.use("/orders", protect, require("./routes/ordersRouter"))
+router.use("/comments",protect,require("./routes/commentsRouter"))
+router.use("/mails",protect,require("./routes/mailRouter"))
+module.exports = router
