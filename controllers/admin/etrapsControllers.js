@@ -2,7 +2,6 @@ const { Etraps } = require("../../models")
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../../utils/appError');
 exports.addEtrap = catchAsync(async(req, res, next) => {
-    console.log(req.body,'jj1l2kj31 123123')
     const size = await Etraps.create(req.body)
     return res.status(201).send(size)
 })

@@ -4,7 +4,7 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Products extends Model {
-        static associate({ Users, Categories, Images,Orderproducts, Productsizes,Seller,Material,Colors,Comments }) {
+        static associate({ Users, Categories, Images,Orderproducts, Productsizes,Seller,Material,Colors,Comments,Etraps }) {
             this.belongsTo(Categories, { foreignKey: "categoryId", as: "category" })
             this.hasMany(Images, { foreignKey: "productId", as: "images" })
             this.hasMany(Productsizes, { foreignKey: "productId", as: "product_sizes" })
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
             this.belongsTo(Colors,{as:"color",foreignKey:"colorId"})
             this.hasMany(Comments,{as:"comments", foreignKey:"productId"})
             this.hasMany(Orderproducts,{as:"order_products", foreignKey:"productId"})
-
+            this.belongsTo(Etraps,{as:"etrap",foreignKey:"etrapId"})
         }
     }
     Products.init({
@@ -61,40 +61,13 @@ module.exports = (sequelize, DataTypes) => {
             },
         },
         body_tm: {
-            type: DataTypes.TEXT,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: "Product description cannot be null",
-                },
-                notEmpty: {
-                    msg: "Product description cannot be empty",
-                },
-            },
+            type: DataTypes.TEXT, 
         },
         body_ru: {
             type: DataTypes.TEXT,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: "Product description cannot be null",
-                },
-                notEmpty: {
-                    msg: "Product description cannot be empty",
-                },
-            },
         },
         body_en: {
             type: DataTypes.TEXT,
-            allowNull: false,
-            validate: {
-                notNull: {
-                    msg: "Product cannot be null",
-                },
-                notEmpty: {
-                    msg: "Product cannot be empty",
-                },
-            },
         },
         edited:{
             type: DataTypes.BOOLEAN,
@@ -139,6 +112,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
 
         },
+        etrapId:DataTypes.UUID,
         note:DataTypes.TEXT,
         categoryId: DataTypes.UUID,
         sellerId: DataTypes.UUID,

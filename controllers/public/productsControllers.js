@@ -303,8 +303,8 @@ if(material&&material.length!=0){
 })
 }
 if(welayat&&welayat.length!=0){
-    where.push({welayat: {
-        [Op.contains]: welayat
+    where.push({etrapId: {
+        [Op.in]: etrapId
     }
 })
 }

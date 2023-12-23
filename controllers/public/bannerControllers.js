@@ -6,41 +6,42 @@ const capitalize = function(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 };
 exports.getAllBanners = catchAsync(async(req, res) => {
-
-    const filter=JSON.parse(req.query.filter)
-    let keyword=req.query.keyword
-    const {endDate,startDate}=filter
-    console.log(keyword,endDate,startDate)
     var where = {};
-    if (keyword && keyword != "undefined") {
-        let keywordsArray = [];
-        keyword = keyword.toLowerCase();
-        keywordsArray.push('%' + keyword + '%');
-        keyword = '%' + capitalize(keyword) + '%';
-        keywordsArray.push(keyword);
-        where = {
-            [Op.or]: [
-                {
-                    name: {
-                        [Op.like]: {
-                            [Op.any]: keywordsArray,
+    let filter
+    if(req.query.filter){
+        filter=JSON.parse(req.query.filter)
+        let keyword=req.query.keyword
+        const {endDate,startDate}=filter
+        if (keyword && keyword != "undefined") {
+            let keywordsArray = [];
+            keyword = keyword.toLowerCase();
+            keywordsArray.push('%' + keyword + '%');
+            keyword = '%' + capitalize(keyword) + '%';
+            keywordsArray.push(keyword);
+            where = {
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.like]: {
+                                [Op.any]: keywordsArray,
+                            },
                         },
                     },
-                },
-                {
-                    link: {
-                        [Op.like]: {
-                            [Op.any]: keywordsArray,
+                    {
+                        link: {
+                            [Op.like]: {
+                                [Op.any]: keywordsArray,
+                            },
                         },
-                    },
-                }
-            ],
-        };
-    }
-    if(filter.startDate!=undefined){
-        where.createdAt = {
-            [Op.gte]: new Date(startDate),
-            [Op.lte]: new Date(endDate) 
+                    }
+                ],
+            };
+        }
+        if(filter.startDate!=undefined){
+            where.createdAt = {
+                [Op.gte]: new Date(startDate),
+                [Op.lte]: new Date(endDate) 
+            }
         }
     }
     const limit=req.query.limit || 20

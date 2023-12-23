@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "adm-zip": "^0.5.10",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -41,7 +42,10 @@
     "sharp": "^0.32.6",
     "simple-swizzle": "^0.2.2",
     "socket.io": "^4.7.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.0",
+    "xlsx": "^0.18.5",
     "yarn": "^1.22.21"
   }
 }

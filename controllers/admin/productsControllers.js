@@ -6,6 +6,8 @@ const AppError = require('../../utils/appError');
 const catchAsync = require('../../utils/catchAsync');
 const { getDate } = require("../../utils/date")
 const uuid = require("uuid")
+const AdmZip=require("adm-zip")
+const reader=require("xlsx")
 const {
     Products,
     Categories,
@@ -267,7 +269,6 @@ exports.uploadProductImage = catchAsync(async(req, res, next) => {
         let buffer = await sharp(photo).webp().resize(454,510).toBuffer()
         await sharp(buffer).toFile(`static/${image}`);
         let newImage = await Images.create({ image, id:image_id, productId: req.params.id })
-
     }
     return res.status(201).send("Sucesss");
 });
@@ -280,6 +281,102 @@ exports.deleteProductImage = catchAsync(async(req, res, next) => {
     await image.destroy()
     return res.status(200).send({ msg: "Sucess" })
 
+})
+exports.uploadExcel=catchAsync(async(req,res,next)=>{
+    req.files = Object.values(req.files)
+    const image = `products.xlsx`;
+    const photo = req.files[0]
+    photo.mv(`./static/${image}`,(err)=>{
+        if(err) return next(new AppError("Somethin went wrong",500))
+    })
+    return res.status(201).send("Sucess");
+})
+exports.uploadZip=catchAsync(async(req,res,next)=>{
+    req.files = Object.values(req.files)
+    const image = `images.zip`;
+    const photo = req.files[0].data
+    fs.writeFileSync(`./zip-images/images.zip`, photo);
+    var zip = new AdmZip(`./zip-images/`+`images.zip`);
+    zip.extractAllTo(/*target path*/ `./zip-images`, /*overwrite*/ true);
+
+    return res.status(201).send("Sucess");
+})
+exports.addFromExcel=catchAsync(async(req,res,next)=>{
+    const filename="./static/"+"products.xlsx"
+    const file = reader.readFile(filename)
+    let data = []
+    const sheets = file.SheetNames
+    for(let i = 0; i < sheets.length; i++)
+    {
+       const temp = reader.utils.sheet_to_json(
+            file.Sheets[file.SheetNames[i]])
+       temp.forEach((res) => {
+          data.push(res)
+       })
+    }
+    const date=new Date()
+    for(let oneData of data){
+        const obj={
+            name_tm:oneData.name_tm,
+            name_ru:oneData.name_ru,
+            name_en:oneData.name_en,
+            body_en:oneData.body_en,
+            body_ru:oneData.body_ru,
+            body_tm:oneData.body_tm,
+            product_code:oneData.product_code,
+            price:oneData.price,
+            discount:oneData.discount,
+            categoryId:oneData.categoryId,
+            subcategoryId:oneData.subcategoryId,
+            price_old:null,
+            sellerId:oneData.sellerId,
+            isActive:true,
+            is_new_expire :date.getTime()
+
+        }
+        if (Number(oneData.discount) > 0 && Number(oneData)!=NaN) {
+            obj.price_old = oneData.price;
+            obj.price =(oneData.price / 100) *(100 - oneData.discount);
+        }
+        const newProduct = await Products.create(obj);
+        if(oneData.sizes){
+            var sizes = []
+            oneData.sizes=oneData.sizes.split(" ")
+            if(oneData.sizes_discount) oneData.sizes_discount=oneData.sizes_discount.split(" ")
+            if(oneData.sizes_quantity) oneData.sizes_quantity=oneData.sizes_quantity.split(" ")
+            oneData.sizes_price=oneData.sizes_price.split(" ")
+
+                for (let i = 0; i < oneData.sizes.length; i++) {
+                    let data = {}
+                    data.price_old = null;
+                    if (oneData.sizes_discount!=undefined && oneData.sizes_discount != []) {
+                        data.discount = oneData.sizes_discount[i]
+                        data.price_old = oneData.sizes_price[i]
+                        data.price = (data.price_old / 100) * (100 - oneData.sizes_discount[i])
+                    }
+                    data.price = oneData.sizes_price[i]
+                    data.size = oneData.sizes[i]
+                    data.productId = newProduct.id
+                    data.stock = oneData.sizes_quantity[i]
+                    let product_size = await Productsizes.create(data)
+                    sizes.push(product_size)
+                }            
+                }
+        const imagesArray=oneData.images.split(",")
+        for (const images of imagesArray) {
+            console.log(images,256)
+            const id = v4()
+            const image = `${id}_product.webp`;
+            const photo = `zip-images/${images}`
+            let buffer = await sharp(photo).resize(1080,720).webp().toBuffer()
+            await sharp(buffer).toFile(`static/${image}`);
+            let newImage = await Images.create({ image, id, productId: newProduct.id })
+        }
+    }
+    const today=new Date()
+    await Seller.update({updatedAt:today},{where:{id:req.body.sellerId}})
+    
+    return res.send(data)
 })
 const intoArray = (file) => {
     if (file[0].length == undefined) return file
