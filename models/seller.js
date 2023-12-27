@@ -4,10 +4,11 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
     class Seller extends Model {
-        static associate({ Products,Categories,Banners}) {
+        static associate({ Products,Categories,Banners,Etraps}) {
             this.hasMany(Products, { as: "products", foreignKey: "sellerId" })
             this.belongsToMany(Categories,{foreignKey:"sellerId",through:"Sellercategory",as:"category"},)
             this.hasMany(Banners,{as:"banners",foreignKey:"sellerId"})
+            this.belongsTo(Etraps,{as:"etrap",foreignKey:"etrapId"})
         }
     }
     Seller.init({
@@ -24,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         isActive: DataTypes.BOOLEAN,
         email:DataTypes.STRING,
         welayat:DataTypes.STRING,
+        etrapId:DataTypes.INTEGER
     }, {
         sequelize,
         tableName: "sellers",

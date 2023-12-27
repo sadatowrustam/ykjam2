@@ -4,13 +4,9 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Etraps extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate({Products}) {
+    static associate({Products,Seller}) {
       this.hasMany(Products,{as:"products",foreignKey:"etrapId"})
+      this.hasMany(Seller,{as:"seller",foreignKey:"etrapId"})
     }
   }
   Etraps.init({

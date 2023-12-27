@@ -92,6 +92,7 @@ exports.addProduct = catchAsync(async(req, res, next) => {
         req.body.price =(req.body.price_old / 100) *(100 - req.body.discount);
     }
     req.body.sellerId = req.seller.id
+    req.body.etrapId=req.body.welayat
     const newProduct = await Products.create(req.body);
     return res.status(201).send(newProduct)
 })

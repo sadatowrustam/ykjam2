@@ -15,6 +15,7 @@ exports.addSeller = catchAsync(async(req, res, next) => {
     console.log(req.body)
     req.body.password = await bcrypt.hash(password, 10)
     req.body.isActive = true
+    req.body.etrapId=req.body.welayat
     let seller = await Seller.create(req.body)
     for(const categoryId of req.body.categoryIds){
         const cat=await Sellercategory.create({categoryId,sellerId:seller.id})
