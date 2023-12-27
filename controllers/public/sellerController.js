@@ -155,7 +155,7 @@ function getWhere({ price,category,color,size,material,welayat}) {
         })
     }
     if(welayat&&welayat.length!=0){
-        where.push({welayat: {
+        where.push({etrapId: {
             [Op.in]: welayat
           }
         })

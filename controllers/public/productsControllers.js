@@ -9,7 +9,8 @@ const {
     Material,
     Colors,
     Comments,
-    Users
+    Users,
+    Etraps
 } = require('../../models');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../../utils/appError');
@@ -45,6 +46,10 @@ exports.getProducts = catchAsync(async(req, res) => {
                 as:"size"
             }
         },
+        {
+            model:Etraps,
+            as:"etrap"
+        }
         ],
         where
     });

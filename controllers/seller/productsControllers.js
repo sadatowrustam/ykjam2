@@ -83,7 +83,7 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
 })
 exports.addProduct = catchAsync(async(req, res, next) => {
     console.log(req.seller)
-    req.body.isActive = false
+    req.body.isActive = true
     // const date = new Date()
     // req.body.is_new_expire = date.getTime()
     req.body.stock = Number(req.body.stock)

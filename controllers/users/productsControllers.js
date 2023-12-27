@@ -367,9 +367,8 @@ function getWhere({ price,category,color,size,material,welayat},sort) {
         })
     }
     if(welayat&&welayat.length!=0){
-        where.push({welayat: {
-            [Op.contains]: welayat
-          }
+        where.push(
+            {etrapId: {[Op.in]: etrapId}
         })
     }
     if (sort == 3) {
