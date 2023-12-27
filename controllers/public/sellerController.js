@@ -18,7 +18,7 @@ exports.getAll = catchAsync(async(req, res, next) => {
     let where={}
     if(welayat && welayat!="") {
         welayat=welayat.split(",")
-        where.welayat=welayat
+        where.etrapId=welayat
     }
     let keywordsArray = [];
     if (keyword) {
@@ -33,7 +33,11 @@ exports.getAll = catchAsync(async(req, res, next) => {
         ],
         limit,
         offset,
-        where
+        where,
+        include:{
+            model:Etraps,
+            as:"etrap"
+        }
     });
     return res.status(200).send({ sellers })
 })
