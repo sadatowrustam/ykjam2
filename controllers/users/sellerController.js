@@ -6,7 +6,8 @@ const {
     Productsizes,
     Sizes,
     Categories,
-    Likedproducts
+    Likedproducts,
+    Etraps
 } = require('../../models');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../../utils/appError');
@@ -61,7 +62,12 @@ exports.sellerProduct = catchAsync(async(req, res, next) => {
         {
             model: Images,
             as: "images",
-        },]
+        },
+        {
+            model:Etraps,
+            as:"etrap"
+        }
+    ]
     })
     product = await isLiked(product,req)
     return res.send({ seller, product })

@@ -19,7 +19,8 @@ const {
     Users,
     Colors,
     Comments,
-    Instock
+    Instock,
+    Etraps
 } = require('../../models');
 const { default: axios } = require('axios');
 const capitalize = function(string) {
@@ -85,6 +86,10 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
                     model:Sizes,
                     as:"size"
                 }
+            },
+            {
+              model:Etraps,
+              as:"etrap"  
             },
             {
                 model: Images,
@@ -186,6 +191,7 @@ exports.addProduct = catchAsync(async(req, res, next) => {
         req.body.price =(req.body.price / 100) *(100 - req.body.discount);
     }
     req.body.isActive=true
+    req.body.etrapId=req.body.welayat
     console.log(req.body)
     const newProduct = await Products.create(req.body);
     return res.status(201).send(newProduct)
