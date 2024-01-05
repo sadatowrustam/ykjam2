@@ -93,24 +93,22 @@ exports.signup = catchAsync(async(req, res, next) => {
             user_checked_phone,
             code
         } = req.body;
-        console.log(req.body)
         const verification=await Verification.findOne({where:{user_phone:user_checked_phone,code}})
         if(!verification) return next(new AppError("Wrong verification code",401))
         if (password != passwordConfirm)
             return next(new AppError('Passwords are not the same', 400));
-        const user = await Users.findOne({
+        let user = await Users.findOne({
             where: { user_phone: [user_checked_phone] },
         });
-        if (user) {
-            return next(new AppError('This number has already registered', 400));
+        if (!user) {
+            user = await Users.create({
+                username,
+                user_phone: user_checked_phone,
+            });
         }
-        const newUser = await Users.create({
-            username,
-            user_phone: user_checked_phone,
-        });
         await verification.destroy()
         const notif=await Notification.create({userId:newUser.id,link:"http://localhost:3000/profile",text:"This is text",type:"register"})
-        createSendToken(newUser, 201, res);
+        createSendToken(user, 201, res);
     } else {
         res.send(400).json({
             msg: 'Firstly you have to verify your number',
