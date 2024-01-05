@@ -91,8 +91,6 @@ exports.signup = catchAsync(async(req, res, next) => {
         let {
             username,
             user_checked_phone,
-            password,
-            passwordConfirm,
             code
         } = req.body;
         console.log(req.body)
@@ -100,7 +98,6 @@ exports.signup = catchAsync(async(req, res, next) => {
         if(!verification) return next(new AppError("Wrong verification code",401))
         if (password != passwordConfirm)
             return next(new AppError('Passwords are not the same', 400));
-        password = await bcrypt.hash(password, 12)
         const user = await Users.findOne({
             where: { user_phone: [user_checked_phone] },
         });
@@ -110,7 +107,6 @@ exports.signup = catchAsync(async(req, res, next) => {
         const newUser = await Users.create({
             username,
             user_phone: user_checked_phone,
-            password,
         });
         await verification.destroy()
         const notif=await Notification.create({userId:newUser.id,link:"http://localhost:3000/profile",text:"This is text",type:"register"})
@@ -123,17 +119,12 @@ exports.signup = catchAsync(async(req, res, next) => {
 });
 
 exports.login = catchAsync(async(req, res, next) => {
-    const { user_phone, password } = req.body;
-    console.log(req.headers["user-agent"])
+    const { user_phone} = req.body;
     if (!user_phone || !password) {
         return next(new AppError('Please provide phone number and password', 400));
     }
 
     const user = await Users.findOne({ where: { user_phone } });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-        return next(new AppError('Incorrect username or password', 401));
-    }
-    user.password = undefined
     createSendToken(user, 200, res);
 });
 

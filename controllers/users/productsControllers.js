@@ -13,6 +13,7 @@ const {
     Comments,
     Mails,
     Blogs,
+    Etraps
 } = require('../../models');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../../utils/appError');
@@ -97,6 +98,10 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
                     as:"images"
                 }
             ]
+            },
+            {
+                model:Etraps,
+                as:"etrap"
             }
         ]
     })

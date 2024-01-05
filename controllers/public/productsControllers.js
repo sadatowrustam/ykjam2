@@ -199,6 +199,10 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
                 }
             ]
             },
+            {
+                model:Etraps,
+                as:"etrap"
+            }
         ]
     })
     if (!oneProduct) {
