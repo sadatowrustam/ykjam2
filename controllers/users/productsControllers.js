@@ -144,7 +144,7 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
                 },
             ],
             },
-            limit: 4,
+            limit: 6,
             order: [
                 ["createdAt", "DESC"],
                 ["images","createdAt","ASC"]

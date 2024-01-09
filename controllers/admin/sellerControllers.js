@@ -124,35 +124,35 @@ exports.updateSeller = catchAsync(async(req, res, next) => {
 exports.deleteSeller = catchAsync(async(req, res, next) => {
     const seller = await Seller.findOne({ where: { id: req.params.id }, include: { model: Products, as: "products" } })
     if (!seller) return next(new AppError("seller with that id not found", 404))
-    for (const one_product of seller.products) {
-        const product = await Products.findOne({
-            where: { id: one_product.id },
-            include: [
-                {
-                    model: Productsizes,
-                    as: "product_sizes"
-                },
-            ]
-        });
-        if (!product) return next(new AppError("Product with that id not found", 404))
-        if (product.product_sizes) {
-            for (const size of product.product_sizes) {
-                let product_size = await Productsizes.findOne({ where: { id: size.id } })
-                await product_size.destroy()
-            }
-        }
-        if (!product)
-            return next(new AppError('Product did not found with that ID', 404));
+    // for (const one_product of seller.products) {
+    //     const product = await Products.findOne({
+    //         where: { id: one_product.id },
+    //         include: [
+    //             {
+    //                 model: Productsizes,
+    //                 as: "product_sizes"
+    //             },
+    //         ]
+    //     });
+    //     if (!product) return next(new AppError("Product with that id not found", 404))
+    //     if (product.product_sizes) {
+    //         for (const size of product.product_sizes) {
+    //             let product_size = await Productsizes.findOne({ where: { id: size.id } })
+    //             await product_size.destroy()
+    //         }
+    //     }
+    //     if (!product)
+    //         return next(new AppError('Product did not found with that ID', 404));
 
-        const images = await Images.findAll({ where: { productId: product.id } })
-        for (const image of images) {
-            fs.unlink(`static/${image.image}`, function(err) {
-                if (err) throw err;
-            })
-            await image.destroy()
-        }
-        await product.destroy();
-    }
+    //     const images = await Images.findAll({ where: { productId: product.id } })
+    //     for (const image of images) {
+    //         fs.unlink(`static/${image.image}`, function(err) {
+    //             if (err) throw err;
+    //         })
+    //         await image.destroy()
+    //     }
+    //     await product.destroy();
+    // }
     await seller.destroy()
     return res.send("Success")
 
