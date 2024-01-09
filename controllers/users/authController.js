@@ -11,9 +11,6 @@ exports.verify_code = catchAsync(async(req, res, next) => {
     if (!req.body.user_checked_phone) {
         const { user_phone } = req.body;
         const user = await Users.findOne({ where: { user_phone } });
-        if (user) {
-            return next(new AppError('This number has already signed as user', 400));
-        }
         const generated_code = randomstring.generate({
             length: 6,
             charset: "numeric"
@@ -21,7 +18,7 @@ exports.verify_code = catchAsync(async(req, res, next) => {
         const obj = {
             code: generated_code,
             number: user_phone,
-            sms: 'Lybas tassyklaýyş koduňyz: '+generated_code,
+            sms: 'Ykjam tassyklaýyş koduňyz: '+generated_code,
         };
         var io = req.app.get('socketio');
         io.emit("verification-phone", obj)
@@ -95,8 +92,6 @@ exports.signup = catchAsync(async(req, res, next) => {
         } = req.body;
         const verification=await Verification.findOne({where:{user_phone:user_checked_phone,code}})
         if(!verification) return next(new AppError("Wrong verification code",401))
-        if (password != passwordConfirm)
-            return next(new AppError('Passwords are not the same', 400));
         let user = await Users.findOne({
             where: { user_phone: [user_checked_phone] },
         });
@@ -107,7 +102,6 @@ exports.signup = catchAsync(async(req, res, next) => {
             });
         }
         await verification.destroy()
-        const notif=await Notification.create({userId:newUser.id,link:"http://localhost:3000/profile",text:"This is text",type:"register"})
         createSendToken(user, 201, res);
     } else {
         res.send(400).json({

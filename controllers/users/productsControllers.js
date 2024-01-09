@@ -32,6 +32,9 @@ exports.getProducts = catchAsync(async(req, res) => {
     if(req.query.sort==3){
         where.push({recommended:true})
     }
+    if(req.query.sort==5){
+        where.push({isNew:true})
+    }
     where.push({isActive:true})
     order.push(["images","createdAt","ASC"])
     let products = await Products.findAll({
@@ -108,16 +111,38 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
     if (!oneProduct) {
         return next(new AppError("Can't find product with that id"), 404);
     }
-    let recommendations = await Products.findAll({
+    let keywordsArray = [];
+    keyword = oneProduct.name_tm.toLowerCase();
+    keywordsArray.push('%' + keyword + '%');
+    keyword = '%' + capitalize(keyword) + '%';
+    keywordsArray.push(keyword);
+    const recommendations = await Products.findAll({
             where: {
                 id: {
                     [Op.ne]: oneProduct.id
                 },
-                [Op.or]: [
-                    { materialId: { [Op.eq]: oneProduct.materialId } },
-                    { sellerId: { [Op.eq]: oneProduct.sellerId } },
-                    { categoryId: { [Op.eq]: oneProduct.categoryId } }
-                ]
+                [Op.or]: [{
+                    name_tm: {
+                        [Op.like]: {
+                            [Op.any]: keywordsArray,
+                        },
+                    },
+                },
+                {
+                    name_ru: {
+                        [Op.like]: {
+                            [Op.any]: keywordsArray,
+                        },
+                    },
+                },
+                {
+                    name_en: {
+                        [Op.like]: {
+                            [Op.any]: keywordsArray,
+                        },
+                    },
+                },
+            ],
             },
             limit: 4,
             order: [
@@ -137,7 +162,9 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
                     model: Images,
                     as: "images",
                 },
-            ]  
+            ]
+            
+        
     })
     const liked_ids = await Likedproducts.findOne({
         where: {

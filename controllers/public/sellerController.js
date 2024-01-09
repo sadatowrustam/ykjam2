@@ -53,6 +53,9 @@ exports.sellerProduct = catchAsync(async(req, res, next) => {
     if(req.query.sortBy==3){
         where.push({recommended:true})
     }
+    if(req.query.sort==5){
+        where.push({isNew:true})
+    }
     where.push({isActive:true})
     order.push(["images","createdAt","ASC"])
     where.push({sellerId:id})
