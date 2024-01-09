@@ -13,7 +13,13 @@ module.exports = {
             phone_number: {
                 type: DataTypes.STRING
             },
-            name: {
+            name_tm: {
+                type: DataTypes.STRING
+            },
+            name_ru: {
+                type: DataTypes.STRING
+            },
+            name_en: {
                 type: DataTypes.STRING
             },
             image: {

@@ -19,7 +19,15 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4
         },
         phone_number: DataTypes.STRING,
-        name: DataTypes.STRING,
+        name_tm: {
+            type: DataTypes.STRING
+        },
+        name_ru: {
+            type: DataTypes.STRING
+        },
+        name_en: {
+            type: DataTypes.STRING
+        },
         image: DataTypes.STRING,
         password: DataTypes.STRING,
         isActive: DataTypes.BOOLEAN,

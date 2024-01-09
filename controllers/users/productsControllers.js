@@ -116,7 +116,7 @@ exports.getOneProduct = catchAsync(async(req, res, next) => {
     keywordsArray.push('%' + keyword + '%');
     keyword = '%' + capitalize(keyword) + '%';
     keywordsArray.push(keyword);
-    const recommendations = await Products.findAll({
+    let recommendations = await Products.findAll({
             where: {
                 id: {
                     [Op.ne]: oneProduct.id
