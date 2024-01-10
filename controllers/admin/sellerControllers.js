@@ -101,14 +101,10 @@ exports.oneSeller = catchAsync(async(req, res, next) => {
     return res.send(seller)
 })
 exports.updateSeller = catchAsync(async(req, res, next) => {
-    const { name, welayat,email,phone_number,isActive,image} = req.body;
-    console.log(req.body)
-    if (!name|| !welayat)
-        return next(new AppError('Invalid credentials', 400));
-
+    const { name_tm,name_ru,name_en, welayat,email,phone_number,isActive,image} = req.body;
     const seller = await Seller.findOne({ where: { id: [req.params.id] } });
     await seller.update({
-        name,
+        name_tm,name_ru,name_en,
         isActive,
         image,
         welayat,
