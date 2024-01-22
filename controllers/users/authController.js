@@ -12,7 +12,7 @@ exports.verify_code = catchAsync(async(req, res, next) => {
         const { user_phone } = req.body;
         const user = await Users.findOne({ where: { user_phone } });
         const generated_code = randomstring.generate({
-            length: 6,
+            length: 4,
             charset: "numeric"
         })
         const obj = {

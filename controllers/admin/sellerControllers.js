@@ -12,7 +12,6 @@ const capitalize = function(string) {
 };
 exports.addSeller = catchAsync(async(req, res, next) => {
     let { password } = req.body
-    console.log(req.body)
     req.body.password = await bcrypt.hash(password, 10)
     req.body.isActive = true
     req.body.etrapId=req.body.welayat
@@ -31,7 +30,7 @@ exports.isActive = catchAsync(async(req, res, next) => {
     }
     await seller.update({ isActive })
     if(isActive==false){
-        await Products.update({isActive:false},{where:{sellerId:id0}})
+        await Products.update({isActive:false},{where:{sellerId:id}})
     }else if(isActive==true){
         await Products.update({isActive:true},{where:{sellerId:id,edited:false}})
     }
@@ -183,7 +182,7 @@ exports.uploadImages=catchAsync(async(req,res,next)=>{
         const image_id = v4()
         var image = `${image_id}.webp`;
         const photo = images.data
-        let buffer = await sharp(photo).webp().resize(500,500).toBuffer()
+        let buffer = await sharp(photo).webp().toBuffer()
         await sharp(buffer).toFile(`static/${image}`);
         // await blogs.update({image})
     }
