@@ -274,13 +274,13 @@ exports.uploadProductImage = catchAsync(async(req, res, next) => {
         const low = `${image_id}_product_low.jpeg`;
         const medium = `${image_id}_product_medium.jpeg`;
         const photo = images.data
-        let buffer = await sharp(photo).jpeg().toBuffer()
-        let buffer_low = await sharp(photo).jpeg({quality:60,progressive:true}).toBuffer()
-        let buffer_medium = await sharp(photo).jpeg({quality:80,progressive:true}).toBuffer()
+        let buffer = await sharp(photo).jpeg({quality:100,progressive:true}).toBuffer()
+        let buffer_low = await sharp(photo).jpeg({quality:10,progressive:true,mozjpeg:true}).toBuffer()
+        let buffer_medium = await sharp(photo).jpeg({quality:20,progressive:true,mozjpeg:true}).toBuffer()
         await sharp(buffer).toFile(`static/${image}`);
         await sharp(buffer_low).toFile(`static/${low}`);
         await sharp(buffer_medium).toFile(`static/${medium}`);
-        let newImage = await Images.create({ image, id:image_id, productId: req.params.id })
+        let newImage = await Images.create({ image, id:image_id, productId: req.params.id,low,medium })
     }
     return res.status(201).send("Sucesss");
 });

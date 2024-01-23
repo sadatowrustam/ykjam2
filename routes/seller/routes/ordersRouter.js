@@ -2,12 +2,11 @@ const express = require('express');
 const {
     getAllOrders,
     getOrderProducts,
-    changeOrderStatus,
     deleteOrderProduct,
     isRead,
     getDailyStats
 } = require('../../../controllers/seller/ordersControllers');
-
+const {changeOrderStatus}=require("../../../controllers/admin/ordersControllers")
 const router = express.Router();
 
 router.get('/', getAllOrders);

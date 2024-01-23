@@ -104,41 +104,6 @@ exports. getOrderProducts = catchAsync(async(req, res, next) => {
     res.status(200).send(order);
 });
 
-exports.changeOrderStatus = catchAsync(async(req, res, next) => {
-    const order = await Orders.findOne({
-        where: {
-            order_id: req.params.id,
-        },
-        include: {
-            model: Orderproducts,
-            as: 'order_products',
-        },
-    });
-
-    if (!order) {
-        return next(new AppError('Order did not found with that ID', 404));
-    }
-
-    if (req.body.status == "delivered") {
-        for (var i = 0; i < order.order_products.length; i++) {
-            const product = await Products.findOne({
-                where: { product_id: order.order_products[i].product_id },
-            });
-            const product_size = await Productsizes
-            const stock = await Stock.findOne({ where: { productId: product.id } });
-            await stock.update({
-                stock_quantity: stock.stock_quantity - order.order_products[i].quantity,
-            });
-            await product.update({ sold_count: product.sold_count + order.order_products[i].quantity })
-        }
-    }
-
-    await Orderproducts.update({ status: req.body.status }, { where: { orderId: order.id } })
-    await order.update({
-        status: req.body.status,
-    });
-    return res.status(201).send(order);
-});
 
 exports.deleteOrderProduct = catchAsync(async(req, res, next) => {
     const orderproduct = await Orderproducts.findOne({
