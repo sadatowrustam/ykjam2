@@ -17,6 +17,7 @@ router.use("/colors",protect,require("./routes/colorRouter"))
 router.use("/sizes",require("./routes/sizesRouter"))
 router.use("/etraps",require("./routes/etrapRouter"))
 router.use('/categories', require('./routes/categoriesRouter')); //delete test etmeli
+router.use("/maincategories",require("./routes/maincategoriesRouter"))
 router.use("/products", require("./routes/productsRouter")) //test etmeli
 router.use("/orders", require("./routes/ordersRouter"))
 router.use("/materials",require("./routes/materialRouter"))
