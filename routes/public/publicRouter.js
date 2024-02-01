@@ -6,6 +6,7 @@ router.post('/contact-us', sendMyMail);
 router.use('/banners', require('./routes/bannersRouter'));
 router.use('/categories', require('./routes/categoriesRouter'));
 router.use('/sub-categories', require('./routes/subcategoriesRouter'));
+router.use("/maincategories",require("./routes/maincategoriesRouter"))
 router.use("/brands", require("./routes/brandsRouter"))
 router.use('/products', require('./routes/productsRouter'));
 router.use("/orders", require("./routes/ordersRouter"))
