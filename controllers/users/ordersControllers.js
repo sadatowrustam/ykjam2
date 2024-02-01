@@ -8,102 +8,80 @@ exports. addMyOrders = catchAsync(async(req, res, next) => {
         address,
         note,
         user_phone,
-        name,surname
+        name,surname,
+        sellerId
     } = req.body;
     // let checkedProducts = [];
     let total_price = 0;
     let total_quantity = 0;
-    let where= {[Op.and]: [{ userId: req.user.id }, { isOrdered: false }]}
+    let where= {[Op.and]: [{ userId: req.user.id }, { isOrdered: false },sellerId]}
     let order_products = await Orderproducts.findAll({where,order:[["createdAt","DESC"]]})
     let orders_array = []
     if (order_products.length == 0) return next(new AppError("Nothing to order", 400))
-    let new_array=[]
-    order_products.sort((a, b) => a.sellerId - b.sellerId);
-    for (let i=0;i<order_products.length;i++) {
-        
-        let filtered=order_products.filter((object) => object.sellerId === order_products[0].sellerId);
-        let obj={
-            sellerId:order_products[0].sellerId,
-            order_products:filtered
+    for (var j = 0; j < order_products.length; j++) {
+        if (order_products[j].productsizeId != null) {
+            var product_size = await Productsizes.findOne({ where: { id: order_products[j].productsizeId },include:{model:Sizes,as:"size"}})
         }
-        new_array.push(obj)
-        order_products.splice(0,filtered.length)
-        if(order_products.length==0) break
-        i=0
-    }
-    for (let i=0;i<new_array.length;i++){
-        total_price=0
-        total_quantity=0
-        for (var j = 0; j < new_array[i].order_products.length; j++) {
-            if (new_array[i].order_products[j].productsizeId != null) {
-                var product_size = await Productsizes.findOne({ where: { id: new_array[i].order_products[j].productsizeId },include:{model:Sizes,as:"size"}})
-            }
-            var product = await Products.findOne({
-                where: { id: new_array[i].order_products[j].productId },
-            });
-            if (product_size) {
-                console.log("ine men")
-                if (product_size.stock < new_array[i].order_products[j].quantity) {
-                    new_array[i].order_products[j].quantity = product_size.stock
-                }
-                // checkedProducts.push(product_size);
-                new_array[i].order_products[j].size=product_size.size.size
-                new_array[i].order_products[j].total_price = product.price * new_array[i].order_products[j].quantity
-            } else if (product) {
-                if (product.stock < new_array[i].order_products[j].quantity) {
-                    new_array[i].order_products[j].quantity = product.stock
-                }
-                new_array[i].order_products[j].total_price = product.price * new_array[i].order_products[j].quantity
-                // checkedProducts.push(product);
-            }
-            total_quantity = total_quantity + new_array[i].order_products[j].quantity;
-            total_price = total_price + new_array[i].order_products[j].total_price;
-        }
-        const order = await Orders.create({
-            userId: req.user.id,
-            total_price,
-            address,
-            user_name: name+" "+surname,
-            user_phone,
-            note,
-            status: "waiting",
-            total_quantity,
-            address,
-            sellerId:new_array[i].sellerId,
-            isRead:false,
-            sellerRead:false
+        var product = await Products.findOne({
+            where: { id: order_products[j].productId },
         });
-        orders_array.push(order)
-        const user=await axios.get("http://localhost:5011/users/"+order.userId)
-        const seller=await axios.get("http://localhost:5011/seller/"+product.sellerId)
-        const io=req.app.get("socketio")
-        io.to(user.data.socketId).emit('user-notification');
-        let count=await Orders.count({where:{sellerRead:false,sellerId:product.sellerId}})
-        io.to(seller.data.socketId).emit('seller-order',count);
-        count=await Orders.count({where:{isRead:false}})
-        io.emit("admin-order",count)
-
-
-        for (var x = 0; x < new_array[i].order_products.length; x++) {
-            await Orderproducts.update({
-                orderId: order.id,
-                quantity: new_array[i].order_products[x].quantity,
-                price: new_array[i].order_products[x].price,
-                total_price: new_array[i].order_products[x].total_price,
-                size: new_array[i].order_products[x].size,
-                isOrdered: true,
-                status: "waiting"
-            }, {
-                where: {
-                    id: new_array[i].order_products[x].id,
-                    }
-            });
-        
-    
+        if (product_size) {
+            console.log("ine men")
+            if (product_size.stock < order_products[j].quantity) {
+                order_products[j].quantity = product_size.stock
+            }
+            order_products[j].size=product_size.size.size
+            order_products[j].total_price = product.price * order_products[j].quantity
+        } else if (product) {
+            if (product.stock < order_products[j].quantity) {
+                order_products[j].quantity = product.stock
+            }
+            order_products[j].total_price = product.price * order_products[j].quantity
         }
+        total_quantity = total_quantity + order_products[j].quantity;
+        total_price = total_price + order_products[j].total_price;
+    }
+    const order = await Orders.create({
+        userId: req.user.id,
+        total_price,
+        address,
+        user_name: name+" "+surname,
+        user_phone,
+        note,
+        status: "waiting",
+        total_quantity,
+        address,
+        sellerId:sellerId,
+        isRead:false,
+        sellerRead:false
+    });
+    orders_array.push(order)
+    const user=await axios.get("http://localhost:5011/users/"+order.userId)
+    const seller=await axios.get("http://localhost:5011/seller/"+product.sellerId)
+    const io=req.app.get("socketio")
+    io.to(user.data.socketId).emit('user-notification');
+    let count=await Orders.count({where:{sellerRead:false,sellerId:product.sellerId}})
+    io.to(seller.data.socketId).emit('seller-order',count);
+    count=await Orders.count({where:{isRead:false}})
+    io.emit("admin-order",count)
+    for (var x = 0; x < order_products.length; x++) {
+        await Orderproducts.update({
+            orderId: order.id,
+            quantity: order_products[x].quantity,
+            price: order_products[x].price,
+            total_price: order_products[x].total_price,
+            size: order_products[x].size,
+            isOrdered: true,
+            status: "waiting"
+        }, {
+            where: {
+                id: order_products[x].id,
+                }
+        });
+    }
         const cut=order.id.slice(0,8)
         const notif=await Notification.create({userId:req.user.id,text:"#"+cut,type:"waiting"})
-    }
+    
     return res.status(200).json({
         status: 'Your orders accepted and will be delivered as soon as possible',
         data: {
