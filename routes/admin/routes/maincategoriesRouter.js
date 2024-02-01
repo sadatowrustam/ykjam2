@@ -3,7 +3,7 @@ const router = express.Router()
 const { addMainCategory, allMainCategories, updateMainCategory,uploadCategoryImage, deleteMainCategory } = require("../../../controllers/admin/maincategoryControllers");
 const { deleteImage } = require('../../../controllers/admin/blogsControllers');
 
-router.post("/add", addMainCategory)
+router.post("/", addMainCategory)
 router.get("/", allMainCategories)
 router.patch("/:id",updateMainCategory)
 router.post("/delete/:id", deleteMainCategory)

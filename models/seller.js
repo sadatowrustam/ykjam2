@@ -33,7 +33,10 @@ module.exports = (sequelize, DataTypes) => {
         isActive: DataTypes.BOOLEAN,
         email:DataTypes.STRING,
         welayat:DataTypes.STRING,
-        etrapId:DataTypes.INTEGER
+        etrapId:DataTypes.INTEGER,
+        delivery_price:DataTypes.INTEGER,
+        free_delivery:DataTypes.INTEGER
+
     }, {
         sequelize,
         tableName: "sellers",

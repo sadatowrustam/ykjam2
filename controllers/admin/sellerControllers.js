@@ -48,10 +48,25 @@ exports.allSellers = catchAsync(async(req, res, next) => {
         keywordsArray.push('%' + keyword + '%');
         keyword = '%' + capitalize(keyword) + '%';
         keywordsArray.push(keyword);
+
         where = {
             [Op.or]: [
                 {
-                    name: {
+                    name_tm: {
+                        [Op.like]: {
+                            [Op.any]: keywordsArray,
+                        },
+                    },
+                },
+                {
+                    name_ru: {
+                        [Op.like]: {
+                            [Op.any]: keywordsArray,
+                        },
+                    },
+                },
+                {
+                    name_en: {
                         [Op.like]: {
                             [Op.any]: keywordsArray,
                         },
@@ -100,7 +115,7 @@ exports.oneSeller = catchAsync(async(req, res, next) => {
     return res.send(seller)
 })
 exports.updateSeller = catchAsync(async(req, res, next) => {
-    const { name_tm,name_ru,name_en, welayat,email,phone_number,isActive,image} = req.body;
+    const { name_tm,name_ru,name_en, welayat,email,phone_number,isActive,image,maincategoryId,delivery_price,free_delivery} = req.body;
     const seller = await Seller.findOne({ where: { id: [req.params.id] } });
     await seller.update({
         name_tm,name_ru,name_en,
@@ -108,7 +123,8 @@ exports.updateSeller = catchAsync(async(req, res, next) => {
         image,
         welayat,
         email,
-        phone_number
+        phone_number,
+        maincategoryId,delivery_price,free_delivery
     });
     await Sellercategory.destroy({where:{sellerId:seller.id}})
     for(const categoryId of req.body.categoryIds){

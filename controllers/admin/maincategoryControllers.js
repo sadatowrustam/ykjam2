@@ -8,6 +8,7 @@ const capitalize = function(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 };
 exports.addMainCategory = catchAsync(async(req, res, next) => {
+    req.body.image=""
     let maincategory = await Maincategory.create(req.body)
     return res.send(maincategory)
 })
@@ -77,9 +78,9 @@ exports.deleteMainCategory = catchAsync(async(req, res, next) => {
 })
 exports.uploadCategoryImage = catchAsync(async(req, res, next) => {
     req.files = Object.values(req.files)
-    const maincategory = await Maincategory.findOne({ where: { id: req.params.id }})
+    const maincategory = await Maincategory.findOne({ where: { id: req.query.id }})
     if (!maincategory) return next(new AppError("maincategory with that id not found", 404))
-    const image = `${req.params.id}_maincategory.webp`;
+    const image = `${req.query.id}_maincategory.webp`;
     const photo = req.files[0].data
     let buffer = await sharp(photo).webp().toBuffer()
     await sharp(buffer).toFile(`static/${image}`);

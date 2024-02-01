@@ -47,7 +47,7 @@ exports.updateMyPassword = catchAsync(async(req, res, next) => {
 
 exports.updateMe = catchAsync(async(req, res, next) => {
     console.log(req.body)
-    const { username, welayat,email,phone_number } = req.body;
+    const { username, welayat,email,phone_number,delivery_price,free_delivery } = req.body;
     const seller = await Seller.findOne({ where: { id: [req.seller.id] } });
     let isActive = false
     await seller.update({
@@ -55,7 +55,7 @@ exports.updateMe = catchAsync(async(req, res, next) => {
         isActive,
         welayat,
         email,
-        phone_number
+        phone_number,delivery_price,free_delivery
     });
     createSendToken(seller, 200, res);
 });
