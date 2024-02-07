@@ -253,6 +253,10 @@ exports.getNotOrderedProducts = catchAsync(async(req, res, next) => {
                 model:Images,
                 as:"images",
                 limit:1
+            },
+            {
+                model:Seller,
+                as:"seller"
             }
         ],
         

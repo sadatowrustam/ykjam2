@@ -1,7 +1,8 @@
 const {
     Maincategory,
-    Sellers,
-    Images
+    Seller,
+    Images,
+    Products
 } = require('../../models');
 const AppError = require('../../utils/appError');
 const catchAsync = require('../../utils/catchAsync');
@@ -30,12 +31,12 @@ exports.getCategorySeller = catchAsync(async(req, res, next) => {
      order = [
         ['updatedAt', 'DESC']
     ];
-    const sellers = await Sellers.findAll({
+    const sellers = await Seller.findAll({
         where: { maincategoryId: id }, //isActive goy sonundan
         order,
         limit,
         offset,
     });
-    const count = await Products.count({ where: { maincategoryId: id } })
+    const count = await Seller.count({ where: { maincategoryId: id } })
     return res.status(200).send({ sellers, count });
 });
