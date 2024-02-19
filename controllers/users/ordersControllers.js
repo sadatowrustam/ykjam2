@@ -14,7 +14,7 @@ exports. addMyOrders = catchAsync(async(req, res, next) => {
     // let checkedProducts = [];
     let total_price = 0;
     let total_quantity = 0;
-    let where= {[Op.and]: [{ userId: req.user.id }, { isOrdered: false },sellerId]}
+    let where= {[Op.and]: [{ userId: req.user.id }, { isOrdered: false },{sellerId}]}
     let order_products = await Orderproducts.findAll({where,order:[["createdAt","DESC"]]})
     let orders_array = []
     if (order_products.length == 0) return next(new AppError("Nothing to order", 400))
@@ -270,7 +270,8 @@ exports.getNotOrderedProducts = catchAsync(async(req, res, next) => {
             body_en,
             body_tm,
             body_ru,
-            material
+            material,
+            seller
         } = product;
         if (order_products[i].productsizeId != null) {
             var product_size = await Productsizes.findOne({ where: { id: order_products[i].productsizeId },include:{model:Sizes,as:"size"} })
@@ -288,6 +289,7 @@ exports.getNotOrderedProducts = catchAsync(async(req, res, next) => {
             image: product.images[0].image,
             quantity: order_products[i].quantity,
             material,
+            seller
         };
         if (product_size) {
             obj.size = product_size.size.size
